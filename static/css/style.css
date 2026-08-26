@@ -380,7 +380,7 @@ select:focus {
 }
 
 .table-wrapper {
-    overflow-x: auto;
+    overflow: visible;
 }
 
 table {
