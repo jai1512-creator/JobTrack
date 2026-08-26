@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="JobTrack settings.">
+    <title>JobTrack | Settings</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="theme-{{ app_settings['theme'] }}">
+    <div class="app-shell">
+        <aside class="sidebar" aria-label="Main navigation">
+            <a class="brand" href="{{ url_for('home') }}" aria-label="JobTrack dashboard"><span class="brand-mark" aria-hidden="true">J</span><span>Job<span>Track</span></span></a>
+            <nav class="nav-links">
+                <a class="nav-link" href="{{ url_for('home') }}"><span class="nav-icon" aria-hidden="true">▦</span> Dashboard</a>
+                <a class="nav-link" href="{{ url_for('home') }}#applications"><span class="nav-icon" aria-hidden="true">▤</span> Applications</a>
+                <a class="nav-link" href="{{ url_for('analytics') }}"><span class="nav-icon" aria-hidden="true">◔</span> Analytics</a>
+                <a class="nav-link active" href="{{ url_for('settings') }}" aria-current="page"><span class="nav-icon" aria-hidden="true">⚙</span> Settings</a>
+            </nav>
+            <div class="sidebar-note"><p>Stay focused</p><span>Keep every opportunity in one place.</span></div>
+        </aside>
+
+        <main class="main-content">
+            <header class="page-header">
+                <div><p class="eyebrow">WORKSPACE</p><h1>Settings</h1><p class="subtitle">Personalize your JobTrack experience.</p></div>
+                <a class="secondary-button" href="{{ url_for('home') }}">← Back to Dashboard</a>
+            </header>
+
+            <div class="settings-layout">
+               <section class="settings-card" aria-labelledby="profile-heading">
+    <div class="settings-heading">
+        <div class="settings-icon" aria-hidden="true">◉</div>
+        <div>
+            <h2 id="profile-heading">Profile</h2>
+            <p>How your name appears in JobTrack.</p>
+        </div>
+    </div>
+
+    <form action="{{ url_for('save_settings') }}" method="POST">
+        <label class="settings-field" for="display-name">
+            Display name
+            <input
+                id="display-name"
+                name="display_name"
+                type="text"
+                value="{{ settings['display_name'] }}"
+                autocomplete="name"
+            >
+        </label>
+
+        <button type="submit" class="primary-button">
+            Save Changes
+        </button>
+    </form>
+
+    <p class="settings-note">
+        Your display name is saved to your JobTrack settings.
+    </p>
+</section>
+
+<section class="settings-card" aria-labelledby="preferences-heading">
+    <div class="settings-heading">
+        <div class="settings-icon" aria-hidden="true">▤</div>
+        <div>
+            <h2 id="preferences-heading">Application Preferences</h2>
+            <p>Choose how you want to work with applications.</p>
+        </div>
+    </div>
+
+    <form action="{{ url_for('save_settings') }}" method="POST">
+        <input
+            type="hidden"
+            name="display_name"
+            value="{{ settings['display_name'] }}"
+        >
+
+        <label class="preference-row" for="show-rejected">
+            <span>
+                <strong>Show rejected applications</strong>
+                <small>Keep closed opportunities visible in your dashboard.</small>
+            </span>
+            <input
+                id="show-rejected"
+                name="show_rejected"
+                type="checkbox"
+                value="1"
+                {% if settings['show_rejected'] %}checked{% endif %}
+            >
+        </label>
+
+        <label class="preference-row" for="newest-first">
+            <span>
+                <strong>Show newest applications first</strong>
+                <small>Sort your application list by the most recent entry.</small>
+            </span>
+            <input
+                id="newest-first"
+                name="newest_first"
+                type="checkbox"
+                value="1"
+                checked
+            >
+        </label>
+
+        <button type="submit" class="primary-button">
+            Save Preferences
+        </button>
+    </form>
+</section>
+
+                <section class="settings-card" aria-labelledby="theme-heading">
+    <div class="settings-heading">
+        <div class="settings-icon" aria-hidden="true">◐</div>
+        <div>
+            <h2 id="theme-heading">Theme Preference</h2>
+            <p>Select a visual preference for future sessions.</p>
+        </div>
+    </div>
+
+    <form action="{{ url_for('save_settings') }}" method="POST">
+        <input
+            type="hidden"
+            name="display_name"
+            value="{{ settings['display_name'] }}"
+        >
+
+        {% if settings['show_rejected'] %}
+        <input type="hidden" name="show_rejected" value="1">
+        {% endif %}
+
+        <div class="theme-options" role="radiogroup" aria-label="Theme preference">
+            <label class="theme-option">
+                <input
+                    type="radio"
+                    name="theme"
+                    value="light"
+                    {% if settings['theme'] == 'light' %}checked{% endif %}
+                >
+                <span class="theme-preview light-preview">
+                    <i></i><b>Light</b>
+                </span>
+            </label>
+
+            <label class="theme-option">
+                <input
+                    type="radio"
+                    name="theme"
+                    value="system"
+                    {% if settings['theme'] == 'system' %}checked{% endif %}
+                >
+                <span class="theme-preview system-preview">
+                    <i></i><b>System</b>
+                </span>
+            </label>
+
+            <label class="theme-option">
+                <input
+                    type="radio"
+                    name="theme"
+                    value="dark"
+                    {% if settings['theme'] == 'dark' %}checked{% endif %}
+                >
+                <span class="theme-preview dark-preview">
+                    <i></i><b>Dark</b>
+                </span>
+            </label>
+        </div>
+
+        <button type="submit" class="primary-button">
+            Save Theme
+        </button>
+    </form>
+
+    <p class="settings-note">
+        Your theme preference is saved for future sessions.
+    </p>
+</section>
+
+                <section class="settings-card danger-card" aria-labelledby="danger-heading">
+                    <div class="settings-heading"><div class="settings-icon danger-icon" aria-hidden="true">!</div><div><h2 id="danger-heading">Danger Zone</h2><p>This action will be available once data-management controls are enabled.</p></div></div>
+                    <form action="{{ url_for('clear_applications') }}" method="POST" onsubmit="return confirm('Are you sure you want to clear all applications? This cannot be undone.');">
+    <button class="danger-button" type="submit">
+        Clear All Applications
+    </button>
+</form>
+                </section>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="JobTrack is a smart job application tracker.">
+    <title>JobTrack | Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="theme-{{ app_settings['theme'] }}">
+    <div class="app-shell">
+        <aside class="sidebar" aria-label="Main navigation">
+            <a class="brand" href="{{ url_for('home') }}" aria-label="JobTrack dashboard">
+                <span class="brand-mark" aria-hidden="true">J</span>
+                <span>Job<span>Track</span></span>
+            </a>
+            <nav class="nav-links">
+                <a class="nav-link active" href="{{ url_for('home') }}" aria-current="page"><span class="nav-icon" aria-hidden="true">▦</span> Dashboard</a>
+                <a class="nav-link" href="{{ url_for('home') }}#applications"><span class="nav-icon" aria-hidden="true">▤</span> Applications</a>
+                <a class="nav-link" href="{{ url_for('analytics') }}"><span class="nav-icon" aria-hidden="true">◔</span> Analytics</a>
+                <a class="nav-link" href="{{ url_for('settings') }}"><span class="nav-icon" aria-hidden="true">⚙</span> Settings</a>
+            </nav>
+            <div class="sidebar-note"><p>Stay focused</p><span>Keep every opportunity in one place.</span></div>
+        </aside>
+
+        <main class="main-content" id="dashboard">
+            <header class="page-header">
+                <div>
+                    <p class="eyebrow">YOUR JOB SEARCH</p>
+                    <h1>Welcome back, {{ settings["display_name"] }}</h1>
+                    <p class="subtitle">Here’s a clear view of your application progress.</p>
+                </div>
+                <button class="primary-button" type="button"><span aria-hidden="true">+</span> Add Application</button>
+            </header>
+
+            <section class="stats-grid" aria-label="Application statistics">
+                <article class="stat-card total-card"><div class="stat-icon" aria-hidden="true">▤</div><div><p>Total Applications</p><strong>{{ stats["total"] }}</strong><span class="stat-trend">+{{ stats['this_month'] }} this month</span></div></article>
+                <article class="stat-card"><div class="stat-icon blue" aria-hidden="true">↗</div><div><p>Applied</p><strong>{{ stats["applied"] }}</strong><span>Awaiting updates</span></div></article>
+                <article class="stat-card"><div class="stat-icon amber" aria-hidden="true">◌</div><div><p>Interviews</p><strong>{{ stats["interviews"] }}</strong><span>In progress</span></div></article>
+                <article class="stat-card"><div class="stat-icon green" aria-hidden="true">✓</div><div><p>Selected</p><strong>{{ stats["selected"] }}</strong><span>Great work!</span></div></article>
+                <article class="stat-card"><div class="stat-icon red" aria-hidden="true">×</div><div><p>Rejected</p><strong>{{ stats["rejected"] }}</strong><span>Keep moving forward</span></div></article>
+            </section>
+            <section class="metrics-card" aria-label="Job search metrics">
+    <div class="section-heading">
+        <div>
+            <h2>Success Metrics</h2>
+            <p>A quick look at your application performance.</p>
+        </div>
+    </div>
+
+    <div class="metrics-grid">
+        <div class="metric-item">
+            <span>Interview Rate</span>
+            <strong>{{ "%.0f"|format(stats["interview_rate"] or 0) }}%</strong>
+        </div>
+
+        <div class="metric-item">
+            <span>Selection Rate</span>
+            <strong>{{ "%.0f"|format(stats["selection_rate"] or 0) }}%</strong>
+        </div>
+    </div>
+</section>
+            <section class="applications-card" id="applications" aria-labelledby="applications-heading">
+                <div class="section-heading">
+                    <div><h2 id="applications-heading">Recent Applications</h2><p>Your most recently tracked opportunities.</p></div>
+                    <a class="view-all" href="#applications">View all <span aria-hidden="true">→</span></a>
+                </div>
+                <div class="table-tools">
+                    <label class="search-box" for="application-search"><span aria-hidden="true">⌕</span><input id="application-search" type="search" placeholder="Search applications"></label>
+                    <label class="filter-label" for="status-filter"><span class="sr-only">Filter by status</span><select id="status-filter" name="status-filter"><option value="all">All statuses</option><option value="applied">Applied</option><option value="interview">Interview</option><option value="selected">Selected</option><option value="rejected">Rejected</option></select></label>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th scope="col">Company</th><th scope="col">Position</th><th scope="col">Applied Date</th><th scope="col">Status</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead>
+                        <tbody>
+    {% if applications %}
+
+        {% for application in applications %}
+        <tr>
+            <td data-label="Company">
+                <div class="company">
+                    <span class="company-logo indigo">{{ application["company"][0] }}</span>
+                    <strong>{{ application["company"] }}</strong>
+                </div>
+            </td>
+
+            <td data-label="Position">
+                {{ application["position"] }}
+            </td>
+
+            <td data-label="Applied Date">
+                {{ application["applied_date"]|format_date }}
+            </td>
+
+            <td data-label="Status">
+                <span class="status-badge {{ application['status'] }}">
+                    {{ application["status"].capitalize() }}
+                </span>
+            </td>
+
+            <td data-label="Actions">
+                <div class="action-menu">
+                    <button
+                        class="more-button"
+                        type="button"
+                        aria-label="Actions for {{ application['company'] }}"
+                    >
+                        •••
+                    </button>
+
+                    <div class="action-dropdown">
+                        <button
+                            type="button"
+                            class="edit-action"
+                            data-id="{{ application['id'] }}"
+                            data-company="{{ application['company'] }}"
+                            data-position="{{ application['position'] }}"
+                            data-date="{{ application['applied_date'] }}"
+                            data-status="{{ application['status'] }}"
+                        >
+                            Edit
+                        </button>
+
+                        <button
+                            type="button"
+                            class="delete-action"
+                            data-id="{{ application['id'] }}"
+                            data-company="{{ application['company'] }}"
+                        >
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+
+    {% else %}
+
+        <tr class="empty-state-row">
+            <td data-label="Company">
+                <strong>No applications yet.</strong>
+            </td>
+            <td data-label="Position">
+                Start tracking your job search.
+            </td>
+            <td data-label="Applied Date">
+                —
+            </td>
+            <td data-label="Status">
+                —
+            </td>
+            <td data-label="Actions">
+                —
+            </td>
+        </tr>
+
+    {% endif %}
+</tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+    <div id="addApplicationModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalTitle">Add Application</h2>
+            <button type="button" id="closeModal">&times;</button>
+        </div>
+        {% if error and edit_id %}
+<div id="modalError" class="modal-error" role="alert">
+    {{ error }}
+</div>
+{% endif %}
+
+
+        <form id="applicationForm" action="/add_application" method="POST">
+            <label>
+                Company
+                <input type="text" id="company" name="company">
+            </label>
+
+            <label>
+                Position
+                <input type="text" id="position" name="position">
+            </label>
+
+            <label>
+                Applied Date
+                <input type="date" id="applied_date" name="applied_date">
+            </label>
+
+            <label>
+                Status
+                <select id="status" name="status">
+                    <option value="applied">Applied</option>
+                    <option value="interview">Interview</option>
+                    <option value="selected">Selected</option>
+                    <option value="rejected">Rejected</option>
+                </select>
+            </label>
+
+            <button type="submit" class="primary-button">
+                Save Application
+            </button>
+        </form>
+    </div>
+</div>
+<script>
+    const addButton = document.querySelector('.page-header .primary-button');
+    const modal = document.getElementById('addApplicationModal');
+    const closeButton = document.getElementById('closeModal');
+    const applicationForm = document.getElementById('applicationForm');
+    const modalTitle = document.getElementById('modalTitle');
+    const companyInput = document.getElementById('company');
+    const positionInput = document.getElementById('position');
+    const dateInput = document.getElementById('applied_date');
+    const statusInput = document.getElementById('status');
+
+  addButton.addEventListener('click', () => {
+    modalTitle.textContent = 'Add Application';
+
+    applicationForm.action = '/add_application';
+
+    applicationForm.reset();
+
+    modal.classList.add('open');
+});
+
+closeButton.addEventListener('click', () => {
+    modal.classList.remove('open');
+});
+
+    // Search and filter applications
+    const searchInput = document.getElementById('application-search');
+    const statusFilter = document.getElementById('status-filter');
+    const tableRows = document.querySelectorAll('table tbody tr');
+
+    function filterApplications() {
+        const searchText = searchInput.value.toLowerCase().trim();
+        const selectedStatus = statusFilter.value;
+
+        tableRows.forEach(row => {
+            const company = row.querySelector('[data-label="Company"]').textContent.toLowerCase();
+            const position = row.querySelector('[data-label="Position"]').textContent.toLowerCase();
+            const status = row.querySelector('[data-label="Status"]').textContent.toLowerCase().trim();
+
+            const matchesSearch =
+                company.includes(searchText) ||
+                position.includes(searchText);
+
+            const matchesStatus =
+                selectedStatus === 'all' ||
+                status === selectedStatus;
+
+            row.style.display =
+                matchesSearch && matchesStatus ? '' : 'none';
+        });
+    }
+
+    searchInput.addEventListener('input', filterApplications);
+    statusFilter.addEventListener('change', filterApplications);
+    // Delete application
+// Action menus
+const actionMenus = document.querySelectorAll('.action-menu');
+
+actionMenus.forEach(menu => {
+    const button = menu.querySelector('.more-button');
+    const dropdown = menu.querySelector('.action-dropdown');
+
+    button.addEventListener('click', (event) => {
+        event.stopPropagation();
+
+        document.querySelectorAll('.action-dropdown').forEach(otherDropdown => {
+            if (otherDropdown !== dropdown) {
+                otherDropdown.style.display = 'none';
+            }
+        });
+
+        dropdown.style.display =
+            dropdown.style.display === 'block' ? 'none' : 'block';
+    });
+});
+// Edit application
+const editButtons = document.querySelectorAll('.edit-action');
+
+editButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        const applicationId = button.dataset.id;
+        const companyName = button.dataset.company;
+        const position = button.dataset.position;
+        const appliedDate = button.dataset.date;
+        const status = button.dataset.status;
+
+        modalTitle.textContent = 'Edit Application';
+
+        companyInput.value = companyName;
+        positionInput.value = position;
+        dateInput.value = appliedDate;
+        statusInput.value = status;
+
+        applicationForm.action = `/edit_application/${applicationId}`;
+
+        modal.style.display = 'flex';
+    });
+});
+
+const editId = "{{ edit_id or '' }}";
+const errorMessage = "{{ error or '' }}";
+
+if (editId && errorMessage) {
+    const editButton = document.querySelector(
+        `.edit-action[data-id="${editId}"]`
+    );
+
+    if (editButton) {
+        editButton.click();
+    }
+}
+
+
+// Delete application
+const deleteButtons = document.querySelectorAll('.delete-action');
+
+deleteButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        const applicationId = button.dataset.id;
+        const companyName = button.dataset.company;
+
+        const shouldDelete = confirm(
+            `Are you sure you want to delete ${companyName}?`
+        );
+
+        if (shouldDelete) {
+            fetch(`/delete_application/${applicationId}`, {
+                method: 'POST'
+            }).then(() => {
+                window.location.reload();
+            });
+        }
+    });
+});
+</script>
+</body>
+</html>

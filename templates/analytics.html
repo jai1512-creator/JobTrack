@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="JobTrack application analytics.">
+    <title>JobTrack | Analytics</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="theme-{{ app_settings['theme'] }}">
+    <div class="app-shell">
+        <aside class="sidebar" aria-label="Main navigation">
+            <a class="brand" href="{{ url_for('home') }}" aria-label="JobTrack dashboard"><span class="brand-mark" aria-hidden="true">J</span><span>Job<span>Track</span></span></a>
+            <nav class="nav-links">
+                <a class="nav-link" href="{{ url_for('home') }}"><span class="nav-icon" aria-hidden="true">▦</span> Dashboard</a>
+                <a class="nav-link" href="{{ url_for('home') }}#applications"><span class="nav-icon" aria-hidden="true">▤</span> Applications</a>
+                <a class="nav-link active" href="{{ url_for('analytics') }}" aria-current="page"><span class="nav-icon" aria-hidden="true">◔</span> Analytics</a>
+                <a class="nav-link" href="{{ url_for('settings') }}"><span class="nav-icon" aria-hidden="true">⚙</span> Settings</a>
+            </nav>
+            <div class="sidebar-note"><p>Stay focused</p><span>Keep every opportunity in one place.</span></div>
+        </aside>
+
+        <main class="main-content">
+            <header class="page-header">
+                <div><p class="eyebrow">YOUR JOB SEARCH</p><h1>Application Analytics</h1><p class="subtitle">A live overview of every opportunity in your tracker.</p></div>
+                <a class="secondary-button" href="{{ url_for('home') }}">← Back to Dashboard</a>
+            </header>
+
+            <section class="stats-grid analytics-stats" aria-label="Application statistics">
+                <article class="stat-card total-card"><div class="stat-icon" aria-hidden="true">▤</div><div><p>Total Applications</p><strong>{{ stats['total'] }}</strong><span>All tracked applications</span></div></article>
+                <article class="stat-card"><div class="stat-icon blue" aria-hidden="true">↗</div><div><p>Applied</p><strong>{{ stats['applied'] }}</strong><span>Awaiting updates</span></div></article>
+                <article class="stat-card"><div class="stat-icon amber" aria-hidden="true">◌</div><div><p>Interviews</p><strong>{{ stats['interviews'] }}</strong><span>In progress</span></div></article>
+                <article class="stat-card"><div class="stat-icon green" aria-hidden="true">✓</div><div><p>Selected</p><strong>{{ stats['selected'] }}</strong><span>Successful outcomes</span></div></article>
+                <article class="stat-card"><div class="stat-icon red" aria-hidden="true">×</div><div><p>Rejected</p><strong>{{ stats['rejected'] }}</strong><span>Closed applications</span></div></article>
+            </section>
+
+            <section class="analytics-card" aria-labelledby="status-breakdown-heading">
+                <div class="section-heading"><div><h2 id="status-breakdown-heading">Status Breakdown</h2><p>Distribution of your applications by current status.</p></div><span class="breakdown-total">{{ stats['total'] }} total</span></div>
+                <div class="breakdown-list">
+                    {% for label, key in [('Applied', 'applied'), ('Interviews', 'interviews'), ('Selected', 'selected'), ('Rejected', 'rejected')] %}
+                    {% set percentage = (stats[key] / stats['total'] * 100) if stats['total'] else 0 %}
+                    <div class="breakdown-row">
+                        <div class="breakdown-label"><span class="breakdown-dot {{ key }}"></span><span>{{ label }}</span><strong>{{ stats[key] }}</strong></div>
+                        <div class="progress-track"><span class="progress-fill {{ key }}" style="--percentage: {{ percentage }}%"></span></div>
+                        <span class="breakdown-percent">{{ '%.0f'|format(percentage) }}%</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
